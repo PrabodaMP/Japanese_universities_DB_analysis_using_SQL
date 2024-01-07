@@ -1,52 +1,23 @@
-CREATE DATABASE IF NOT EXISTS japanese_universities;
-
-USE japanese_universities;
-
-CREATE TABLE jpn_uni
-(
-	code VARCHAR(50),
-    name VARCHAR(255),
-    type VARCHAR(50),
-    postal_code VARCHAR(50),
-    phone VARCHAR(50),
-    state VARCHAR(75),
-    latitude Double,
-    longitude Double,
-    found VARCHAR(10),
-    faculty_count INT,
-    dept_count INT,
-    has_grad VARCHAR(4),
-    has_remote VARCHAR(4),
-    review_rating Double,
-    review_count INT,
-    difficulty_SD Double,
-    difficulty_rank CHAR
-);
-
-LOAD DATA LOCAL INFILE 'C:/Users/prabo/Desktop/Data Projects/SQL/Japanese Universities/japanese_universities.csv'
-INTO TABLE jpn_uni
-FIELDS TERMINATED BY ','
-IGNORE 1 LINES;
-
 ## Inspect data columns types
 DESCRIBE jpn_uni;
 
-### Retrieve all columns and display the first 10 rows of the dataset ###
+/* Retrieve all columns and display the first 10 rows of the dataset */
 SELECT * FROM jpn_uni LIMIT 10;
 
 ### Identify missing values in the 'review_rating' column ###
-SELECT 
+SELECT
 	(
 		SELECT COUNT(*)
 		FROM jpn_uni
 		WHERE review_rating IS NULL OR review_rating = ''
 	) AS review_rating_missing,
-    COUNT(*) AS tatal_universities
+	COUNT(*) AS tatal_universities
 FROM
 	jpn_uni;
-## Result: Total 813 universities and has 15 review_rating_missing values ##
 
-### Identify missing values in the and 'difficulty_SD' column ###
+/* Result: Total 813 universities and has 15 review_rating_missing values */
+
+/* Identify missing values in the and 'difficulty_SD' column */
 SELECT 
 	(
 		SELECT COUNT(*)
@@ -56,29 +27,32 @@ SELECT
     COUNT(*) AS tatal_universities
 FROM
 	jpn_uni;
-## Result: Total 813 universities and has 59 difficulty_SD_missing values ##
 
-### Number of university types ###
+/* Result: Total 813 universities and has 59 difficulty_SD_missing values */
+
+/* Number of university types */
 SELECT
 	COUNT(DISTINCT type) AS num_university_types
 FROM
 	jpn_uni;
-## Result: There are 3 types of university types ##
 
-### List all the types of universities ###
+/* Result: There are 3 types of university types */
+
+/* List all the types of universities */
 SELECT
 	DISTINCT type
 FROM
 	jpn_uni;
     
-### Investigate the number of states the universities are spread across ###
+/* Investigate the number of states the universities are spread across */
 SELECT
 	COUNT(DISTINCT state) AS num_states
 FROM
 	jpn_uni;
-## Result: All the universities are spread across 47 states. ##
 
-### Investigate the number of universities in each state ###
+/* Result: All the universities are spread across 47 states. */
+
+/* Investigate the number of universities in each state */
 SELECT
 	state,
     COUNT(name)
@@ -89,7 +63,7 @@ GROUP BY
 ORDER BY
 	COUNT(state) DESC;
 
-### The top 10 states with the highest number of universities ###
+/* The top 10 states with the highest number of universities */
 SELECT
 	state,
     COUNT(name)
@@ -100,7 +74,7 @@ GROUP BY
 ORDER BY
 	COUNT(state) DESC LIMIT 10;    
 
-### Number of universities belongs to each type ###
+/* Number of universities belongs to each type */
 SELECT 
     type,
     COUNT(name) AS count
@@ -109,14 +83,15 @@ FROM
 GROUP BY
 	type;
 
-### Number of postal codes are available in the dataset ###
+/* Number of postal codes are available in the dataset */
 SELECT 
 	COUNT(DISTINCT postal_code) AS num_postal_codes
 FROM
 	jpn_uni;
-## Result: There are 804 unique postal codes in the dataset ##
 
-### Number of universities belonging to each Postal Code ###
+/* Result: There are 804 unique postal codes in the dataset */
+
+/* Number of universities belonging to each Postal Code */
 SELECT
 	postal_code,
 	COUNT(name) AS count
@@ -127,7 +102,7 @@ GROUP BY
 ORDER BY
 	COUNT(name) DESC;
     
-### Examine the distribution of universities according to their type within each state ###
+/* Examine the distribution of universities according to their type within each state */
 SELECT
 	State,
     COUNT(CASE WHEN type = 'National' THEN name END) AS 'National Universities',
@@ -141,8 +116,8 @@ GROUP BY
 ORDER BY
 	COUNT(name) DESC;
 
-### Identify the top 10 states with the highest number of National, Public, and Private universities. ###
-# National Universities #
+/* Identify the top 10 states with the highest number of National, Public, and Private universities. */
+/* National Universities */
 SELECT
 	State,
     COUNT(name) AS 'National Universities'
@@ -155,7 +130,7 @@ GROUP BY
 ORDER BY
 	COUNT(name) DESC LIMIT 10;
 
-# Public Universities #
+/* Public Universities */
 SELECT
 	State,
     COUNT(name) AS 'Public Universities'
@@ -168,7 +143,7 @@ GROUP BY
 ORDER BY
 	COUNT(name) DESC LIMIT 10;
     
-# Private Universities #
+/* Private Universities */
 SELECT
 	State,
     COUNT(name) AS 'Private Universities'
@@ -181,7 +156,7 @@ GROUP BY
 ORDER BY
 	COUNT(name) DESC LIMIT 10;
     
-### Determine the maximum, average, and minimum faculty counts for each type of university ###
+/* Determine the maximum, average, and minimum faculty counts for each type of university */
 SELECT
 	type,
     MAX(faculty_count) AS max_faculty_count,
@@ -192,7 +167,7 @@ FROM
 GROUP BY
 	type;
     
-### Determine the maximum, average, and minimum department counts for each type of university ###
+/* Determine the maximum, average, and minimum department counts for each type of university */
 SELECT
 	type,
     MAX(department_count) AS max_department_count,
@@ -203,7 +178,7 @@ FROM
 GROUP BY
 	type;
     
-### Explore the availability of graduate schools for each type of university ###
+/* Explore the availability of graduate schools for each type of university */
 SELECT
 	type,
     COUNT(CASE WHEN has_grad = 'TRUE' THEN name END) AS 'has_grad=TRUE',
@@ -213,7 +188,7 @@ FROM
 GROUP BY
 	type;
 	
-### Explore the availability of remote learning option for each type of university ###
+/* Explore the availability of remote learning option for each type of university */
 SELECT
 	type,
     COUNT(CASE WHEN has_remote = 'TRUE' THEN name END) AS 'has_remote=TRUE',
@@ -223,7 +198,7 @@ FROM
 GROUP BY
 	type;
 
-### Analyze the average review ratings and review counts for each type of university, as well as a combination of both ###
+/* Analyze the average review ratings and review counts for each type of university, as well as a combination of both */
 SELECT
 	type,
     AVG(review_rating) AS 'avg_review_rating'
@@ -255,7 +230,7 @@ GROUP BY
 ORDER BY
     AVG(review_rating) DESC;
     
-### Explore the distribution of universities according to their difficulty rank. ###
+/* Explore the distribution of universities according to their difficulty rank. */
 SELECT
 	difficulty_rank,
     COUNT(name) AS 'Count'
